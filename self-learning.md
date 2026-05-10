@@ -1,9 +1,9 @@
 ## 📋 Study Checklist
 
-- [/] [HTTP Protocol in Go](#http-protocol-in-go)
-- [/] [Linux Fundamentals](#linux-fundamentals)
-- [/] [Web Security (CORS & HTTPS/TLS)](#web-security-cors--httpstls)
-- [/] [TypeScript](#typescript)
+- [ ] [HTTP Protocol in Go](#http-protocol-in-go)
+- [ ] [Linux Fundamentals](#linux-fundamentals)
+- [ ] [Web Security (CORS & HTTPS/TLS)](#web-security-cors--httpstls)
+- [ ] [TypeScript](#typescript)
 - [ ] [Testing in Go](#testing-in-go)
 - [ ] [Kubernetes Coordination](#kubernetes-coordination)
 
