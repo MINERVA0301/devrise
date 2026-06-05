@@ -56,7 +56,7 @@ WEB_PUBLIC="${DEPLOY_DIR}/public"
 # ---------------------------------------------------------------------------
 info "Step 1/6 — Installing system packages..."
 apt-get update -y
-apt-get install -y curl wget git build-essential nginx certbot python3-certbot-nginx
+apt-get install -y curl wget git unzip build-essential nginx certbot python3-certbot-nginx
 
 # Install Go (latest stable)
 GO_VERSION="1.24.3"
