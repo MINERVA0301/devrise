@@ -1,6 +1,6 @@
 [Unit]
 Description=Flight Booking Service
-After=network.target redis.service
+After=network.target
 
 [Service]
 Type=simple
@@ -10,9 +10,7 @@ ExecStart=/opt/flight-booking-service/flight-booking-service
 Restart=on-failure
 RestartSec=5s
 Environment=PORT=8080
-Environment=REDIS_URL=redis://localhost:6379
 Environment=FRONTEND_ORIGIN=https://YOUR_DOMAIN
-Environment=GIN_MODE=release
 
 [Install]
 WantedBy=multi-user.target
