@@ -12,10 +12,7 @@ import (
 	"flight-booking-service/internal/store"
 )
 
-func main() {
-	st := store.New()
-	origin := os.Getenv("FRONTEND_ORIGIN")
-
+func newServer(st *store.Store, origin string) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /api/v1/bookings", func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +26,21 @@ func main() {
 			writeJSON(w, http.StatusBadRequest, errBody(err.Error()))
 			return
 		}
-		writeJSON(w, http.StatusCreated, st.Create(req))
+		if len(req.Seats) != len(req.Passengers) {
+			writeJSON(w, http.StatusUnprocessableEntity, errBody("seats count must equal passengers count"))
+			return
+		}
+		b, err := st.Create(req)
+		if err != nil {
+			var conflict *store.ErrSeatConflict
+			if errors.As(err, &conflict) {
+				writeJSON(w, http.StatusConflict, errBody(err.Error()))
+				return
+			}
+			writeJSON(w, http.StatusInternalServerError, errBody("internal error"))
+			return
+		}
+		writeJSON(w, http.StatusCreated, map[string]any{"data": b})
 	})
 
 	mux.HandleFunc("GET /api/v1/bookings/pnr/{pnr}", func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +50,7 @@ func main() {
 			writeJSON(w, http.StatusNotFound, errBody("booking not found"))
 			return
 		}
-		writeJSON(w, http.StatusOK, b)
+		writeJSON(w, http.StatusOK, map[string]any{"data": b})
 	})
 
 	mux.HandleFunc("GET /api/v1/bookings/{id}", func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +60,7 @@ func main() {
 			writeJSON(w, http.StatusNotFound, errBody("booking not found"))
 			return
 		}
-		writeJSON(w, http.StatusOK, b)
+		writeJSON(w, http.StatusOK, map[string]any{"data": b})
 	})
 
 	mux.HandleFunc("OPTIONS /", func(w http.ResponseWriter, r *http.Request) {
@@ -57,12 +68,19 @@ func main() {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
+	return mux
+}
+
+func main() {
+	st := store.New()
+	origin := os.Getenv("FRONTEND_ORIGIN")
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 	log.Printf("flight-booking-service listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	log.Fatal(http.ListenAndServe(":"+port, newServer(st, origin)))
 }
 
 func setCORS(w http.ResponseWriter, origin string) {

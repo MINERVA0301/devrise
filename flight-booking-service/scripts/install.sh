@@ -110,6 +110,8 @@ info "Frontend built."
 # Step 4 — Install files and systemd service
 # ---------------------------------------------------------------------------
 info "Step 4/6 — Deploying files to ${DEPLOY_DIR}..."
+# Stop the service before overwriting the binary to avoid "text file busy"
+systemctl stop flight-booking-service 2>/dev/null || true
 mkdir -p "${DEPLOY_DIR}" "${WEB_PUBLIC}"
 
 # Copy Go binary
